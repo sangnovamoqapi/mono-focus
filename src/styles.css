@@ -1,0 +1,63 @@
+/* Global Styles & Variables */
+:root {
+  /* Colors - IDE Theme (Dracula/Monokai inspired) */
+  --color-bg: #1e1e1e;
+  --color-bg-active: #2d2d2d;
+  --color-text: #d4d4d4;
+  --color-comment: #6a9955;
+  --color-keyword: #569cd6;
+  --color-string: #ce9178;
+  --color-function: #dcdcaa;
+  --color-cursor: #aeafad;
+  --color-selection: #264f78;
+  
+  /* Typography */
+  --font-mono: 'Fira Code', 'Consolas', 'Monaco', monospace;
+
+  /* Spacing */
+  --line-height: 1.6;
+}
+
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Utilities */
+.hidden {
+  display: none !important;
+}
+
+.faded {
+  opacity: 0.1;
+  transition: opacity 0.3s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f4f4f;
+}
