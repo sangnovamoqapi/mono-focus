@@ -41,6 +41,9 @@ import { StreamLine } from '../../models/stream.model';
               (focus)="setActive(i)"
               placeholder=""
             >
+            @if (streamService.showTimeSpent() && line.timeSpent) {
+              <span class="time-spent">{{ formatTime(line.timeSpent) }}</span>
+            }
           </div>
         }
       </div>
@@ -107,7 +110,7 @@ import { StreamLine } from '../../models/stream.model';
     }
 
     .line-input {
-      flex: 1; /* Take remaining space */
+      flex: 0 1 600px; /* Limit width so time spent isn't too far */
       background: transparent;
       border: none;
       color: var(--color-text);
@@ -116,6 +119,14 @@ import { StreamLine } from '../../models/stream.model';
       outline: none;
       padding: 2px 0;
       line-height: 1.5;
+      min-width: 200px; /* Ensure it's not too small */
+    }
+
+    .time-spent {
+      color: var(--color-comment);
+      font-size: 0.8rem;
+      margin-left: 1rem;
+      opacity: 0.7;
     }
 
     .line-input.header {
@@ -136,19 +147,16 @@ import { StreamLine } from '../../models/stream.model';
 export class ManifestComponent implements AfterViewChecked {
   streamService = inject(StreamService);
   
-  @ViewChildren('lineInput') lineInputs!: QueryList<ElementRef>;
+  @ViewChildren('lineInput') lineInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   constructor() {
     effect(() => {
-      // Auto-focus the active line when index changes
       const index = this.streamService.activeLineIndex();
-      // We need to wait for view to update, handled in ngAfterViewChecked or setTimeout
       setTimeout(() => this.focusLine(index), 0);
     });
   }
 
   ngAfterViewChecked() {
-    // Optional: Ensure focus persists if lost
   }
 
   focusLine(index: number) {
@@ -167,8 +175,13 @@ export class ManifestComponent implements AfterViewChecked {
   }
 
   checkInput(event: Event, id: string) {
-    // Optional: Handle immediate DOM manipulation if needed for smoother feel
-    // But relying on service update should be fine if fast enough.
+    // Optional
+  }
+
+  formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
   }
 
   handleKey(event: KeyboardEvent, index: number, id: string) {
@@ -178,6 +191,9 @@ export class ManifestComponent implements AfterViewChecked {
     } else if (event.key === 'ArrowDown') {
       event.preventDefault();
       this.streamService.setActiveLine(index + 1);
+    } else if (event.altKey && event.key.toLowerCase() === 'v') {
+      event.preventDefault();
+      this.streamService.toggleShowTimeSpent();
     } else if (event.key === 'Enter') {
       if (event.metaKey || event.ctrlKey) {
         // Focus Mode or Uncomplete

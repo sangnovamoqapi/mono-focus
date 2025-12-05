@@ -16,12 +16,14 @@ export class StreamService {
   private activeLineIndexSignal = signal<number>(0);
   private focusModeSignal = signal<boolean>(false);
   private stashSignal = signal<string[]>([]);
+  private showTimeSpentSignal = signal<boolean>(true);
 
   // Computed
   readonly lines = this.linesSignal.asReadonly();
   readonly activeLineIndex = this.activeLineIndexSignal.asReadonly();
   readonly isFocusMode = this.focusModeSignal.asReadonly();
   readonly stash = this.stashSignal.asReadonly();
+  readonly showTimeSpent = this.showTimeSpentSignal.asReadonly();
 
   readonly activeLine = computed(() => 
     this.linesSignal()[this.activeLineIndexSignal()]
@@ -47,6 +49,16 @@ export class StreamService {
   });
 
   // Actions
+  toggleShowTimeSpent() {
+    this.showTimeSpentSignal.update(v => !v);
+  }
+
+  updateLineTime(id: string, seconds: number) {
+    this.linesSignal.update(lines => 
+      lines.map(l => l.id === id ? { ...l, timeSpent: (l.timeSpent || 0) + seconds } : l)
+    );
+  }
+
   updateLine(id: string, content: string) {
     this.linesSignal.update(lines => 
       lines.map(l => {
