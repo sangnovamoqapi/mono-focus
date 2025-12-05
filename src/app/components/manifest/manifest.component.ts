@@ -66,7 +66,14 @@ import { StreamLine } from '../../models/stream.model';
       color: #6e7681;
       font-size: 0.9rem;
       user-select: none;
-      padding-top: 4px; /* Align with input text */
+    }
+
+    .line-number {
+      height: calc(1.5rem + 4px);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     .line-number.active {
