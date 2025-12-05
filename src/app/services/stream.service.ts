@@ -55,7 +55,6 @@ export class StreamService {
           let isHeader = l.isHeader || newContent.startsWith('>');
 
           // Immediate check for marker at start
-          console.log(newContent, isHeader);
           if (newContent.startsWith('>')) {
              isHeader = true;
              newContent = newContent.substring(1); // Strip first char
@@ -63,7 +62,6 @@ export class StreamService {
              isHeader = false;
              newContent = newContent.substring(1); // Strip first char
           }
-          console.log(newContent, isHeader);
           return { ...l, content: newContent, isHeader };
         }
         return l;
@@ -121,9 +119,24 @@ export class StreamService {
 
   completeActiveLine() {
     const idx = this.activeLineIndexSignal();
-    this.linesSignal.update(lines => 
-      lines.map((l, i) => i === idx ? { ...l, completed: true } : l)
-    );
+    
+    this.linesSignal.update(lines => {
+      const activeLine = lines[idx];
+      if (!activeLine) return lines;
+
+      const newLines = [...lines];
+      newLines[idx] = { ...activeLine, completed: true };
+
+      const parentIndent = activeLine.indentLevel;
+      for (let i = idx + 1; i < newLines.length; i++) {
+        if (newLines[i].indentLevel > parentIndent) {
+          newLines[i] = { ...newLines[i], completed: true };
+        } else {
+          break;
+        }
+      }
+      return newLines;
+    });
     
     // Exit focus mode
     this.focusModeSignal.set(false);
@@ -131,9 +144,24 @@ export class StreamService {
 
   uncompleteActiveLine() {
     const idx = this.activeLineIndexSignal();
-    this.linesSignal.update(lines => 
-      lines.map((l, i) => i === idx ? { ...l, completed: false } : l)
-    );
+    
+    this.linesSignal.update(lines => {
+      const activeLine = lines[idx];
+      if (!activeLine) return lines;
+
+      const newLines = [...lines];
+      newLines[idx] = { ...activeLine, completed: false };
+
+      const parentIndent = activeLine.indentLevel;
+      for (let i = idx + 1; i < newLines.length; i++) {
+        if (newLines[i].indentLevel > parentIndent) {
+          newLines[i] = { ...newLines[i], completed: false };
+        } else {
+          break;
+        }
+      }
+      return newLines;
+    });
   }
 
   addToStash(content: string) {
